@@ -1,0 +1,13 @@
+train: train\images
+val: valid\images
+test: test\images
+
+nc: 26
+names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+roboflow:
+  workspace: team-roboflow
+  project: american-sign-language-poly
+  version: 4
+  license: Private
+  url: https://universe.roboflow.com/team-roboflow/american-sign-language-poly/dataset/4

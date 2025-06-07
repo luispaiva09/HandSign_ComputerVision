@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/luism/OneDrive/Ambiente de Trabalho/EI/3º ANO/2º SEMESTRE/AOP/Computer_Vision/ASL/runs/mlflow/963414189047770031/36d73148d2984f19a963fe078c6c9f47/artifacts
+end_time: 1749258234671
+entry_point_name: ''
+experiment_id: '963414189047770031'
+lifecycle_stage: active
+run_id: 36d73148d2984f19a963fe078c6c9f47
+run_name: sign-language-model
+run_uuid: 36d73148d2984f19a963fe078c6c9f47
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749235886863
+status: 3
+tags: []
+user_id: luism
