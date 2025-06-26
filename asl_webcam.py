@@ -1,7 +1,13 @@
 from ultralytics import YOLO
 import cv2
+from gtts import gTTS
+import os
+import pygame
 import time
 from datetime import datetime
+import ollama
+import tkinter as tk
+import threading
 
 model = YOLO("asl-yolov8/sign-language-model/weights/best.pt")
 cap = cv2.VideoCapture(0)
@@ -10,9 +16,63 @@ if not cap.isOpened():
     print("Erro ao abrir a webcam.")
     exit()
 
+def show_meaning_window(text, duration=60):
+    def close_after_delay():
+        time.sleep(duration)
+        window.destroy()
+
+    window = tk.Tk()
+    window.title("Significado")
+    window.geometry("700x500")
+
+    label = tk.Label(window, text=text, wraplength=380, font=("Arial", 12), justify="left")
+    label.pack(padx=20, pady=20)
+
+    threading.Thread(target=close_after_delay, daemon=True).start()
+    window.mainloop()
+
+def get_meaning_from_ollama(word):
+    prompt = f"Explica o significado da palavra '{word}' em português de Portugal, de uma maneira simples, em 1 ou 2 parágrafos."
+
+    response = ollama.chat(
+        model='mistral',
+        messages=[
+            {'role': 'user', 'content': prompt}
+        ]
+    )
+
+    return response['message']['content'].strip()
+
 letra_atual = None
 tempo_inicial = 0
 letras_confirmadas = []
+
+def speak(word):
+    meaning = get_meaning_from_ollama(word)
+    if meaning:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open('significados.txt', 'a', encoding='utf-8') as f:
+            f.write(f"[{timestamp}] {word}: {meaning}\n")
+        print(f"Texto guardado: {meaning}")
+
+    full_text = f"{word}. Significado: {meaning}"
+    print(full_text)
+
+    tts = gTTS(text=full_text, lang='pt', tld='pt')
+    tts.save("temp_audio.mp3")
+
+    pygame.mixer.init()
+    pygame.mixer.music.load("temp_audio.mp3")
+    pygame.mixer.music.play()
+
+    show_thread = threading.Thread(target=show_meaning_window, args=(full_text,))
+    show_thread.start()
+
+    while pygame.mixer.music.get_busy():
+        time.sleep(0.1)
+
+    pygame.mixer.quit()
+    os.remove("temp_audio.mp3")
 
 while True:
     ret, frame = cap.read()
@@ -67,6 +127,7 @@ while True:
             with open("output.txt", "a", encoding="utf-8") as file:
                 file.write(f"[{timestamp}] {texto_final}\n")
             print(f"Texto guardado: {texto_final}")
+            speak(texto_final)
             letras_confirmadas = []
 
 cap.release()
